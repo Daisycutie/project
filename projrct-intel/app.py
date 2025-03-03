@@ -32,8 +32,6 @@ def page_page1():
     df = pd.read_csv(url)  # เอาตัวแปร url มาใช้
     st.dataframe(df)
 
-    st.dataframe(df)
-
     st.header("การเตรียมข้อมูลและการพัฒนา")
     
     #หาnull
