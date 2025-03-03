@@ -27,9 +27,11 @@ def page_page1():
     """)
     
 
-    
+    url = "https://raw.githubusercontent.com/Daisycutie/project/refs/heads/main/projrct-intel/train%20(1).csv"
     st.subheader("**ข้อมูลในไฟล์ csv**")
-    df = pd.read_csv(r"projrct-intel\train (1).csv") 
+    df = pd.read_csv(url)  # เอาตัวแปร url มาใช้
+    st.dataframe(df)
+
     st.dataframe(df)
 
     st.header("การเตรียมข้อมูลและการพัฒนา")
