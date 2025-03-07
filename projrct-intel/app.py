@@ -130,9 +130,6 @@ def page_page3():
 
 def page_page4():
     st.title("**Demo Machine Learning**")
-    def page_page4():
-    st.title("**Demo Machine Learning**")
-    
     # โหลดข้อมูล
     df = pd.read_csv("https://raw.githubusercontent.com/Daisycutie/project/refs/heads/main/projrct-intel/train%20(1).csv")
 
