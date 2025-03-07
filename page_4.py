@@ -56,8 +56,15 @@ def page_page4():
         input_data = pd.DataFrame([[item_weight, item_mrp, item_visibility, outlet_year]],
                                   columns=['Item_Weight', 'Item_MRP', 'Item_Visibility', 'Outlet_Establishment_Year'])
 
-        # Standardize ข้อมูลอินพุต
-        input_data_scaled = scaler.transform(input_data)
+        # ปรับข้อมูลให้เหมือนกับข้อมูลฝึก
+        input_data = pd.get_dummies(input_data)  # ทำ one-hot encoding เช่นเดียวกับข้อมูลฝึก
+
+        # ตรวจสอบให้แน่ใจว่า input_data มีคอลัมน์ที่เหมือนกับข้อมูลที่ฝึก
+        input_data = input_data.reindex(columns=X.columns, fill_value=0)  # เติมค่าศูนย์ในคอลัมน์ที่ขาด
+
+        # Standardize ข้อมูลอินพุต สำหรับ SVR เท่านั้น
+        if model_choice == "SVR":
+            input_data_scaled = scaler.transform(input_data)
 
         # ใช้โมเดลที่เลือกทำนาย
         if model_choice == "SVR":
