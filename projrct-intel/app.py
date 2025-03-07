@@ -1,5 +1,11 @@
 import streamlit as st
 import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVR
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error
+from sklearn.preprocessing import StandardScaler
+
 
 st.sidebar.title("เลือกหน้า")
 page = st.sidebar.radio("Select page", ("Machine Learning", "Neural Network", 
@@ -27,9 +33,9 @@ def page_page1():
     """)
     
 
-    url = "https://raw.githubusercontent.com/Daisycutie/project/refs/heads/main/projrct-intel/train%20(1).csv"
+    
     st.subheader("**ข้อมูลในไฟล์ csv**")
-    df = pd.read_csv(url)  # เอาตัวแปร url มาใช้
+    df = pd.read_csv(r"projrct-intel\train (1).csv") 
     st.dataframe(df)
 
     st.header("การเตรียมข้อมูลและการพัฒนา")
@@ -120,9 +126,22 @@ def page_page3():
     st.title("**Demo Neural Network**")
    
 
+
 def page_page4():
     st.title("**Demo Machine Learning**")
-    
+
+   # Load data and handle missing values
+    df = pd.read_csv('train (1).csv')  # Ensure the correct path to the dataset
+    df['Item_Weight'] = df['Item_Weight'].fillna(df['Item_Weight'].mean())
+    df['Outlet_Size'] = df['Outlet_Size'].fillna(df['Outlet_Size'].mode()[0])
+    df = pd.get_dummies(df, drop_first=True)
+
+    # Features and target variable
+    X = df.drop(['Item_Outlet_Sales'], axis=1)
+    y = df['Item_Outlet_Sales']
+
+    # Train-test split
+    X_train, X_val, y_train
 
 # แสดงเนื้อหาของหน้าที่ผู้ใช้เลือก
 if page == "Machine Learning":
