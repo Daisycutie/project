@@ -133,21 +133,14 @@ def page_page4():
     # โหลดข้อมูล
     df = pd.read_csv("https://raw.githubusercontent.com/Daisycutie/project/refs/heads/main/projrct-intel/train%20(1).csv")
 
-    # ตรวจสอบว่าโหลดข้อมูลได้หรือไม่
-    if df.empty:
-        st.error("❌ ไม่สามารถโหลดข้อมูลได้")
-        return
-    
     # จัดการค่า Missing Values
     df['Item_Weight'] = df['Item_Weight'].fillna(df['Item_Weight'].mean())
     df['Outlet_Size'] = df['Outlet_Size'].fillna(df['Outlet_Size'].mode()[0])
+
+    # One-hot encoding
     df = pd.get_dummies(df, drop_first=True)
 
     # Features และ Target Variable
-    if 'Item_Outlet_Sales' not in df.columns:
-        st.error("❌ คอลัมน์ 'Item_Outlet_Sales' ไม่พบในข้อมูล!")
-        return
-
     X = df.drop(['Item_Outlet_Sales'], axis=1)
     y = df['Item_Outlet_Sales']
 
@@ -167,17 +160,33 @@ def page_page4():
     svr_model.fit(X_train_scaled, y_train)
     rf_model.fit(X_train, y_train)
 
-    # ทำนายค่า
-    svr_pred = svr_model.predict(X_val_scaled)
-    rf_pred = rf_model.predict(X_val)
+    # 📌 **ให้ผู้ใช้เลือกโมเดลที่ต้องการใช้**
+    model_choice = st.radio("📊 เลือกโมเดลที่ต้องการใช้ทำนาย", ("SVR", "Random Forest"))
 
-    # คำนวณค่า MAE
-    svr_mae = mean_absolute_error(y_val, svr_pred)
-    rf_mae = mean_absolute_error(y_val, rf_pred)
+    # 📌 **แสดงฟอร์มให้ผู้ใช้กรอกข้อมูลเอง**
+    st.subheader("🔍 กรอกค่าคุณสมบัติของสินค้าเพื่อลองทำนายยอดขาย")
 
-    # แสดงผล
-    st.write(f"📊 **SVR MAE:** {svr_mae:.2f}")
-    st.write(f"🌳 **Random Forest MAE:** {rf_mae:.2f}")
+    item_weight = st.number_input("Item Weight (น้ำหนักสินค้า)", min_value=0.0, value=5.0)
+    item_mrp = st.number_input("Item MRP (ราคาขายปลีกสูงสุด)", min_value=0.0, value=200.0)
+    item_visibility = st.number_input("Item Visibility (%)", min_value=0.0, max_value=1.0, value=0.02)
+    outlet_year = st.number_input("Outlet Establishment Year", min_value=1980, max_value=2025, value=2005)
+
+    # เมื่อกดปุ่ม "ทำนาย"
+    if st.button("🔮 ทำนายยอดขาย"):
+        # สร้าง DataFrame จากค่าที่ผู้ใช้กรอก
+        input_data = pd.DataFrame([[item_weight, item_mrp, item_visibility, outlet_year]],
+                                  columns=['Item_Weight', 'Item_MRP', 'Item_Visibility', 'Outlet_Establishment_Year'])
+
+        # Standardize ข้อมูลอินพุต
+        input_data_scaled = scaler.transform(input_data)
+
+        # ใช้โมเดลที่เลือกทำนาย
+        if model_choice == "SVR":
+            prediction = svr_model.predict(input_data_scaled)[0]
+            st.success(f"📈 **SVR ทำนายยอดขาย:** {prediction:.2f}")
+        else:
+            prediction = rf_model.predict(input_data)[0]
+            st.success(f"🌳 **Random Forest ทำนายยอดขาย:** {prediction:.2f}")
 
 # แสดงเนื้อหาของหน้าที่ผู้ใช้เลือก
 if page == "Machine Learning":
