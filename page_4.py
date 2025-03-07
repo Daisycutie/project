@@ -3,21 +3,42 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.metrics import mean_absolute_error
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_absolute_error
+import joblib
 
-def page_page4():
-    st.title("**Demo Machine Learning**")
-
-    # โหลดข้อมูล
+# ใช้ @st.cache_data เพื่อเก็บข้อมูล
+@st.cache_data
+def load_data():
+    # โหลดข้อมูลจาก URL
     df = pd.read_csv("https://raw.githubusercontent.com/Daisycutie/project/refs/heads/main/projrct-intel/train%20(1).csv")
-
+    
     # จัดการค่า Missing Values
     df['Item_Weight'] = df['Item_Weight'].fillna(df['Item_Weight'].mean())
     df['Outlet_Size'] = df['Outlet_Size'].fillna(df['Outlet_Size'].mode()[0])
 
     # One-hot encoding
     df = pd.get_dummies(df, drop_first=True)
+    
+    return df
+
+# ใช้ @st.cache_resource เพื่อเก็บโมเดล
+@st.cache_resource
+def train_models(X_train, y_train):
+    svr_model = SVR(kernel='rbf')
+    rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+    # ฝึกโมเดล
+    svr_model.fit(X_train, y_train)
+    rf_model.fit(X_train, y_train)
+
+    return svr_model, rf_model
+
+def page_page4():
+    st.title("**Demo Machine Learning**")
+
+    # โหลดข้อมูล
+    df = load_data()
 
     # Features และ Target Variable
     X = df.drop(['Item_Outlet_Sales'], axis=1)
@@ -31,18 +52,13 @@ def page_page4():
     X_train_scaled = scaler.fit_transform(X_train)
     X_val_scaled = scaler.transform(X_val)
 
-    # โหลดโมเดล SVR และ Random Forest
-    svr_model = SVR(kernel='rbf')
-    rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+    # ฝึกโมเดล
+    svr_model, rf_model = train_models(X_train_scaled, y_train)
 
-    # เทรนโมเดล
-    svr_model.fit(X_train_scaled, y_train)
-    rf_model.fit(X_train, y_train)
-
-    # 📌 **ให้ผู้ใช้เลือกโมเดลที่ต้องการใช้**
+    # 📌 ให้ผู้ใช้เลือกโมเดลที่ต้องการใช้
     model_choice = st.radio("📊 เลือกโมเดลที่ต้องการใช้ทำนาย", ("SVR", "Random Forest"))
 
-    # 📌 **แสดงฟอร์มให้ผู้ใช้กรอกข้อมูลเอง**
+    # 📌 แสดงฟอร์มให้ผู้ใช้กรอกข้อมูลเอง
     st.subheader("🔍 กรอกค่าคุณสมบัติของสินค้าเพื่อลองทำนายยอดขาย")
 
     item_weight = st.number_input("Item Weight (น้ำหนักสินค้า)", min_value=0.0, value=5.0)
@@ -74,3 +90,6 @@ def page_page4():
             prediction = rf_model.predict(input_data)[0]
             st.success(f"🌳 **Random Forest ทำนายยอดขาย:** {prediction:.2f}")
 
+# เรียกใช้งานฟังก์ชันนี้ในแอป
+if __name__ == '__main__':
+    page_page4()
