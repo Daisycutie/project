@@ -132,7 +132,7 @@ def page_page4():
     st.title("**Demo Machine Learning**")
 
    # Load data and handle missing values
-    df = pd.read_csv('train (1).csv')  # Ensure the correct path to the dataset
+    df = pd.read_csv("https://raw.githubusercontent.com/Daisycutie/project/refs/heads/main/projrct-intel/train%20(1).csv")
     df['Item_Weight'] = df['Item_Weight'].fillna(df['Item_Weight'].mean())
     df['Outlet_Size'] = df['Outlet_Size'].fillna(df['Outlet_Size'].mode()[0])
     df = pd.get_dummies(df, drop_first=True)
