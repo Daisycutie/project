@@ -130,46 +130,57 @@ def page_page3():
 
 def page_page4():
     st.title("**Demo Machine Learning**")
-    # Train-test split (ต้องใส่ให้ครบ)
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+    def page_page4():
+    st.title("**Demo Machine Learning**")
     
-    # ทำ Standardization
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_val_scaled = scaler.transform(X_val)
-    
-    # โหลดโมเดล SVR และ Random Forest
-    svr_model = SVR(kernel='rbf')
-    rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
-    
-    # เทรนโมเดล
-    svr_model.fit(X_train_scaled, y_train)
-    rf_model.fit(X_train, y_train)
-    
-    # ทำนายค่า
-    svr_pred = svr_model.predict(X_val_scaled)
-    rf_pred = rf_model.predict(X_val)
-    
-    # คำนวณค่า MAE
-    svr_mae = mean_absolute_error(y_val, svr_pred)
-    rf_mae = mean_absolute_error(y_val, rf_pred)
-    
-    # แสดงผล
-    st.write(f"📊 **SVR MAE:** {svr_mae:.2f}")
-    st.write(f"🌳 **Random Forest MAE:** {rf_mae:.2f}")
-
-   # Load data and handle missing values
+    # โหลดข้อมูล
     df = pd.read_csv("https://raw.githubusercontent.com/Daisycutie/project/refs/heads/main/projrct-intel/train%20(1).csv")
+
+    # ตรวจสอบว่าโหลดข้อมูลได้หรือไม่
+    if df.empty:
+        st.error("❌ ไม่สามารถโหลดข้อมูลได้")
+        return
+    
+    # จัดการค่า Missing Values
     df['Item_Weight'] = df['Item_Weight'].fillna(df['Item_Weight'].mean())
     df['Outlet_Size'] = df['Outlet_Size'].fillna(df['Outlet_Size'].mode()[0])
     df = pd.get_dummies(df, drop_first=True)
 
-    # Features and target variable
+    # Features และ Target Variable
+    if 'Item_Outlet_Sales' not in df.columns:
+        st.error("❌ คอลัมน์ 'Item_Outlet_Sales' ไม่พบในข้อมูล!")
+        return
+
     X = df.drop(['Item_Outlet_Sales'], axis=1)
     y = df['Item_Outlet_Sales']
 
     # Train-test split
-    X_train, X_val, y_train
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Standardization
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_val_scaled = scaler.transform(X_val)
+
+    # โหลดโมเดล SVR และ Random Forest
+    svr_model = SVR(kernel='rbf')
+    rf_model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+    # เทรนโมเดล
+    svr_model.fit(X_train_scaled, y_train)
+    rf_model.fit(X_train, y_train)
+
+    # ทำนายค่า
+    svr_pred = svr_model.predict(X_val_scaled)
+    rf_pred = rf_model.predict(X_val)
+
+    # คำนวณค่า MAE
+    svr_mae = mean_absolute_error(y_val, svr_pred)
+    rf_mae = mean_absolute_error(y_val, rf_pred)
+
+    # แสดงผล
+    st.write(f"📊 **SVR MAE:** {svr_mae:.2f}")
+    st.write(f"🌳 **Random Forest MAE:** {rf_mae:.2f}")
 
 # แสดงเนื้อหาของหน้าที่ผู้ใช้เลือก
 if page == "Machine Learning":
