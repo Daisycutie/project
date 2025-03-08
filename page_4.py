@@ -56,10 +56,10 @@ def page_page4():
     svr_model, rf_model = train_models(X_train_scaled, y_train)
 
     # 📌 ให้ผู้ใช้เลือกโมเดลที่ต้องการใช้
-    model_choice = st.radio("📊 เลือกโมเดลที่ต้องการใช้ทำนาย", ("SVR", "Random Forest"))
+    model_choice = st.radio(" Select the model you want to use for prediction", ("SVR", "Random Forest"))
 
     # 📌 แสดงฟอร์มให้ผู้ใช้กรอกข้อมูลเอง
-    st.subheader("🔍 กรอกค่าคุณสมบัติของสินค้าเพื่อลองทำนายยอดขาย")
+    st.subheader(" Enter the product attributes to try predicting sales 🔍 ")
 
     item_weight = st.number_input("Item Weight (น้ำหนักสินค้า)", min_value=0.0, value=5.0)
     item_mrp = st.number_input("Item MRP (ราคาขายปลีกสูงสุด)", min_value=0.0, value=200.0)
@@ -67,13 +67,13 @@ def page_page4():
     outlet_year = st.number_input("Outlet Establishment Year", min_value=1980, max_value=2025, value=2005)
 
     # เมื่อกดปุ่ม "ทำนาย"
-    if st.button("🔮 ทำนายยอดขาย"):
+    if st.button("Predict 🔮 "):
         # สร้าง DataFrame จากค่าที่ผู้ใช้กรอก
         input_data = pd.DataFrame([[item_weight, item_mrp, item_visibility, outlet_year]],
                                   columns=['Item_Weight', 'Item_MRP', 'Item_Visibility', 'Outlet_Establishment_Year'])
 
         # ปรับข้อมูลให้เหมือนกับข้อมูลฝึก
-        input_data = pd.get_dummies(input_data)  # ทำ one-hot encoding เช่นเดียวกับข้อมูลฝึก
+        input_data = pd.get_dummies(input_data)  
 
         # ตรวจสอบให้แน่ใจว่า input_data มีคอลัมน์ที่เหมือนกับข้อมูลที่ฝึก
         input_data = input_data.reindex(columns=X.columns, fill_value=0)  # เติมค่าศูนย์ในคอลัมน์ที่ขาด
@@ -90,6 +90,6 @@ def page_page4():
             prediction = rf_model.predict(input_data)[0]
             st.success(f"🌳 **Random Forest ทำนายยอดขาย:** {prediction:.2f}")
 
-# เรียกใช้งานฟังก์ชันนี้ในแอป
+# เรียกใช้งานฟังก์ชันนี้
 if __name__ == '__main__':
     page_page4()
