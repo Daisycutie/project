@@ -28,7 +28,7 @@ def page_page3():
         
         return predicted_emotion, pred
 
-    # อินเตอร์เฟซสำหรับผู้ใช้
+    
     st.write("Upload an image to predict the emotion")
 
     # อัพโหลดภาพ
